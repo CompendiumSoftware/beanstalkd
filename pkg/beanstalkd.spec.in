@@ -28,21 +28,21 @@ web applications by running time-consuming tasks asynchronously.
 
 
 %prep
-%setup -q
-if [ ! -e configure ]; then
-  sh buildconf.sh
-fi
+%setup -cq
+#if [ ! -e configure ]; then
+  #sh buildconf.sh
+#fi
+
 
 %build
-%configure --disable-rpath --docdir=%{_defaultdocdir}/%{name}-%{version}
 make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
+make install BINDIR=$RPM_BUILD_ROOT%{_bindir} DESTDIR=$RPM_BUILD_ROOT
 %{__install} -p -D -m 0644 doc/%{name}.1 %{buildroot}%{_mandir}/man1/%{name}.1
-%{__install} -p -D -m 0755 scripts/%{name}.init %{buildroot}%{_initrddir}/%{name}
-%{__install} -p -D -m 0644 scripts/%{name}.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/%{name}
+%{__install} -p -D -m 0755 adm/sysv/%{name}.init %{buildroot}%{_initrddir}/%{name}
+%{__install} -p -D -m 0644 adm/sysv/%{name}.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/%{name}
 
 
 %clean
@@ -67,8 +67,7 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%doc %{_defaultdocdir}/%{name}-%{version}/protocol.txt
-%doc README COPYING doc/protocol.txt
+%doc README doc/protocol.txt
 %{_initrddir}/%{name}
 %{_bindir}/%{name}
 %{_mandir}/man1/%{name}.1.gz

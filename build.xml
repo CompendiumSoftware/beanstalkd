@@ -1,0 +1,43 @@
+<project name="beanstalkd" default="build" basedir=".">
+	<property environment="env"/>
+
+	<property name="version" value="1.8" />
+	<property name="rpm_spec" value="${env.HOME}/rpmbuild/SPECS/${ant.project.name}.spec"/>
+	<property name="rpm_source" value="${env.HOME}/rpmbuild/SOURCES/${ant.project.name}-${version}.tar.gz"/>
+	<property name="rpm_rpmdir" value="${env.HOME}/rpmbuild/RPMS"/>
+
+	<target name="clean">
+		<delete dir="${basedir}/build" />
+		<mkdir dir="${basedir}/build" />
+	</target>
+
+	<target name="package">
+		<tar destfile="${rpm_source}" basedir="${basedir}">
+		</tar>
+	</target>
+	
+	<target name="build" depends="package">
+		<exec executable="rpmdev-setuptree" />
+		<!-- Prepend Jenkins build information to top of RPM spec file -->
+		<concat destfile="${rpm_spec}">
+			<header trimleading="yes">
+				%define ci_build_number ${env.BUILD_NUMBER}
+				%define ci_build_id ${env.BUILD_ID}
+				%define ci_job_name ${env.JOB_NAME}
+				%define ci_build_tag ${env.BUILD_TAG}
+				%define ci_workspace ${env.WORKSPACE}
+			</header>
+			<filterchain>
+				<replacetokens>
+					<token key="VERSION" value="${version}"/>
+				</replacetokens>
+			</filterchain>
+			<fileset file="${basedir}/pkg/${ant.project.name}.spec.in"/>
+		</concat>
+
+		<exec executable="rpmbuild" failonerror="true">
+			<arg line="--define '_rpmdir ${rpm_rpmdir}'"/>
+			<arg line="-ba ${rpm_spec}"/>
+		</exec>
+	</target>
+</project>

@@ -8,7 +8,7 @@ OS=$(shell uname|tr A-Z a-z)
 INSTALL=install
 TAR=tar
 
-VERS=$(shell ./vers.sh)
+VERS=$(/bin/sh ./vers.sh)
 TARG=beanstalkd
 MOFILE=main.o
 OFILES=\
@@ -86,7 +86,7 @@ ifneq ($(shell ./verc.sh),$(shell cat vers.c 2>/dev/null))
 .PHONY: vers.c
 endif
 vers.c:
-	./verc.sh >vers.c
+	/bin/sh ./verc.sh >vers.c
 
 .PHONY: dist
 dist: $(TARG)-$(VERS).tar.gz
