@@ -384,6 +384,7 @@ reserve_job(Conn *c, job j)
     j->r.state = Reserved;
     job_insert(&c->reserved_jobs, j);
     j->reserver = c;
+    c->pending_timeout = -1;
     if (c->soonest_job && j->r.deadline_at < c->soonest_job->r.deadline_at) {
         c->soonest_job = j;
     }
@@ -1691,7 +1692,6 @@ conn_data(Conn *c)
         }
 
         c->cmd_read += r; /* we got some bytes */
-        fprintf(stderr, "r %d\n", r);
 
         c->cmd_len = cmd_len(c); /* find the EOL */
 
