@@ -61,7 +61,7 @@ start() {
         fi
     fi
 
-    $exec $options &
+    $exec $options >/dev/null 2>&1 &
     retval=$?
     if [ $retval -eq 0 ]; then
         touch $lockfile
